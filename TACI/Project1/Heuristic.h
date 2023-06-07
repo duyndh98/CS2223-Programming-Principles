@@ -23,9 +23,6 @@ inline uint32_t ManhattanTaciHeuristic::CalculateCost(TaciState left_state, Taci
 		right_positions[right_state.GetItemValue(item_id)] = item_id;
 	}
 
-	/*left_state.Print();
-	right_state.Print();*/
-
 	uint32_t cost = 0;
 	for (int item = 1; item < size; item++)
 	{
@@ -37,28 +34,3 @@ inline uint32_t ManhattanTaciHeuristic::CalculateCost(TaciState left_state, Taci
 
 	return cost;
 }
-
-class BinaryTaciHeuristic
-{
-public:
-	static uint32_t CalculateCost(TaciState left_state, TaciState right_state);
-};
-
-inline uint32_t BinaryTaciHeuristic::CalculateCost(TaciState left_state, TaciState right_state)
-{
-	size_t size = left_state.GetItemsSize();
-	size_t width = (size_t)sqrt(size);
-
-	uint32_t cost = 0;
-	for (uint8_t item_id = 0; item_id < size; item_id++)
-	{
-		if (!right_state.GetItemValue(item_id))
-			continue;
-
-		if (left_state.GetItemValue(item_id) != right_state.GetItemValue(item_id))
-			cost++;
-	}
-
-	return cost;
-}
-

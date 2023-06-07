@@ -2,35 +2,75 @@
 //
 
 #include <iostream>
+#include <chrono>
 
 #include "AStar.h"
 #include "TACI.h"
 #include "Heuristic.h"
 
+TaciState RequestUserState(int width)
+{
+	std::vector<uint8_t> items(width * width); 
+	for (size_t item_id = 0; item_id < items.size(); item_id++)
+	{
+		int value;
+		while (true)
+		{  
+			std::cout << "(" << item_id / width + 1 << ", " << item_id % width + 1 << ") ";
+			std::cin >> value;
+
+			if (value >= 0 && value < items.size())
+				break;
+
+			std::cout << "Retry" << std::endl;
+		};
+
+		items[item_id] = value;
+	}
+	TaciState state(items);
+	state.Print();
+
+	return state;
+}
+
+template<class State, class Heuristic>
+void Solve(State src, State dst)
+{	
+	AStar<State, Heuristic> astar;
+
+	auto begin_clock = std::chrono::high_resolution_clock::now();
+	astar.Solve(src, dst);
+	auto end_clock = std::chrono::high_resolution_clock::now();
+
+	astar.Print();
+	std::cout << "Found solution in " << std::chrono::duration_cast<std::chrono::milliseconds>(end_clock - begin_clock) << std::endl;
+}
+
 int main()
 {
 	const int WIDTH = 3;
 
-	//TaciState a(true, 16);
-	//uint8_t a[] = {  };
+	std::cout << "================================================================" << std::endl;
+	std::cout << "TACI 8 PUZZLE SOLVER" << std::endl;
+	std::cout << "================================================================" << std::endl;
+	std::cout << std::endl;
 
-	std::vector<uint8_t> src_items = { 4, 1, 3, 0, 2, 5, 7, 8, 6 };
-	TaciState src(src_items);
-	
-	std::cout << "Src" << std::endl;
-	src.Print();
+	// 4 1 3 0 2 5 7 8 6 1 2 3 4 5 6 7 8 0
 
-	std::vector<uint8_t> dst_items = { 1, 2, 3, 4, 5, 6, 7, 8, 0 };
-	TaciState dst(dst_items);
-	
-	std::cout << "Dst" << std::endl;
-	dst.Print();
+	// { 4 1 3 0 2 5 7 8 6 };
+	std::cout << "Source " << WIDTH << "x" << WIDTH << std::endl;
+	TaciState src = RequestUserState(WIDTH);
 
-	AStar<TaciState, BinaryTaciHeuristic> astar;
-	astar.Solve(src, dst);
-	astar.Print();
+	// { 1 2 3 4 5 6 7 8 0 };
+	std::cout << "Destination " << WIDTH << "x" << WIDTH << std::endl;
+	TaciState dst = RequestUserState(WIDTH);
 
-	//bool solved = astar.Solve(src, dst);
+	std::cout << std::endl;
+	std::cout << "----------------------------------------------------------------" << std::endl;
+	std::cout << "SOLVING USING MANHATTAN HEURISTIC" << std::endl;
+	std::cout << "----------------------------------------------------------------" << std::endl;
+	std::cout << std::endl;
+	Solve<TaciState, ManhattanTaciHeuristic>(src, dst);
 
 	system("pause");
 
