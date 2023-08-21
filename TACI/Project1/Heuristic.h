@@ -34,3 +34,25 @@ inline uint32_t ManhattanTaciHeuristic::CalculateCost(TaciState left_state, Taci
 
 	return cost;
 }
+
+class HammingTaciHeuristic
+{
+public:
+	static uint32_t CalculateCost(TaciState left_state, TaciState right_state);
+};
+
+inline uint32_t HammingTaciHeuristic::CalculateCost(TaciState left_state, TaciState right_state)
+{
+	size_t size = left_state.GetItemsSize();
+
+	uint32_t cost = 0;
+	for (uint8_t item_id = 0; item_id < size; item_id++)
+	{
+		int left_item = left_state.GetItemValue(item_id);
+		int right_item = right_state.GetItemValue(item_id);
+		if (left_item != right_item && left_item && right_item)
+			cost++;
+	}
+
+	return cost;
+}

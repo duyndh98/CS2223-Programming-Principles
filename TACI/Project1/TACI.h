@@ -27,6 +27,7 @@ public:
 
 	void Print();
 	std::vector<TaciState> GetNextStates();
+	int GetMoveCost();
 };
 
 inline TaciState::TaciState(bool shuffle, size_t width)
@@ -61,7 +62,7 @@ inline void TaciState::Print()
 {
 	size_t width = std::sqrt(_items.size());
 
-	std::cout << GetHash() << std::endl;
+	std::cout << std::endl;
 
 	size_t item_id = 0;
 	for (size_t row = 0; row < width; row++)
@@ -97,10 +98,10 @@ inline std::vector<TaciState> TaciState::GetNextStates()
 
 	std::vector<std::tuple<int, int>> next_offsets =
 	{
-		{0, -1},
-		{0, 1},
-		{1, 0},
-		{-1, 0},
+		{-1, 0},	// left
+		{1, 0},		// right
+		{0, -1},	// up
+		{0, 1},		// down
 	};
 
 	std::vector<TaciState> next_states;
@@ -123,7 +124,12 @@ inline std::vector<TaciState> TaciState::GetNextStates()
 
 		TaciState state(items);
 		next_states.push_back(state);
-	}	
+	}
 
 	return next_states;
+}
+
+inline int TaciState::GetMoveCost()
+{
+	return 1;
 }

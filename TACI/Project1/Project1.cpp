@@ -33,21 +33,35 @@ TaciState RequestUserState(int width)
 	return state;
 }
 
+TaciState GenerateState(TaciState dst_state, int step_count)
+{
+	TaciState state = dst_state;
+	for (size_t step = 0; step < step_count; step++)
+	{
+		std::vector<TaciState> next_states = state.GetNextStates();
+		state = next_states[rand() % next_states.size()];
+	}
+
+	return state;
+}
+
 template<class State, class Heuristic>
 void Solve(State src, State dst)
 {	
-	AStar<State, Heuristic> astar;
+	AStar<State, Heuristic> astar(src, dst);
 
 	auto begin_clock = std::chrono::high_resolution_clock::now();
-	astar.Solve(src, dst);
+	astar.Solve();
 	auto end_clock = std::chrono::high_resolution_clock::now();
 
 	astar.Print();
-	std::cout << "Found solution in " << std::chrono::duration_cast<std::chrono::milliseconds>(end_clock - begin_clock) << std::endl;
+	std::cout << "Finished in " << std::chrono::duration_cast<std::chrono::milliseconds>(end_clock - begin_clock) << std::endl;
 }
 
 int main()
 {
+	srand(time(0));
+
 	const int WIDTH = 3;
 
 	std::cout << "================================================================" << std::endl;
@@ -55,22 +69,38 @@ int main()
 	std::cout << "================================================================" << std::endl;
 	std::cout << std::endl;
 
-	// 4 1 3 0 2 5 7 8 6 1 2 3 4 5 6 7 8 0
-
-	// { 4 1 3 0 2 5 7 8 6 };
-	std::cout << "Source " << WIDTH << "x" << WIDTH << std::endl;
-	TaciState src = RequestUserState(WIDTH);
-
-	// { 1 2 3 4 5 6 7 8 0 };
+	// 1 2 3 4 5 6 7 8 0
 	std::cout << "Destination " << WIDTH << "x" << WIDTH << std::endl;
-	TaciState dst = RequestUserState(WIDTH);
+	TaciState dst_state = RequestUserState(WIDTH);
+	
+	// 4 1 3 0 2 5 7 8 6
+	TaciState src_state;
+
+	if (0)
+	{
+		std::cout << "Source " << WIDTH << "x" << WIDTH << std::endl;
+		src_state = RequestUserState(WIDTH);
+	}
+	else
+	{
+		src_state = GenerateState(dst_state, 30);
+		std::cout << "Source " << WIDTH << "x" << WIDTH << std::endl;
+		src_state.Print();
+	}
 
 	std::cout << std::endl;
 	std::cout << "----------------------------------------------------------------" << std::endl;
-	std::cout << "SOLVING USING MANHATTAN HEURISTIC" << std::endl;
+	std::cout << "USING MANHATTAN HEURISTIC" << std::endl;
 	std::cout << "----------------------------------------------------------------" << std::endl;
 	std::cout << std::endl;
-	Solve<TaciState, ManhattanTaciHeuristic>(src, dst);
+	Solve<TaciState, ManhattanTaciHeuristic>(src_state, dst_state);
+
+	std::cout << std::endl;
+	std::cout << "----------------------------------------------------------------" << std::endl;
+	std::cout << "USING HAMMING HEURISTIC" << std::endl;
+	std::cout << "----------------------------------------------------------------" << std::endl;
+	std::cout << std::endl;
+	Solve<TaciState, HammingTaciHeuristic>(src_state, dst_state);
 
 	system("pause");
 
