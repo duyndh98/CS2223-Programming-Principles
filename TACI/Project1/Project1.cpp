@@ -36,10 +36,18 @@ TaciState RequestUserState(int width)
 TaciState GenerateState(TaciState dst_state, int step_count)
 {
 	TaciState state = dst_state;
+
+	uint64_t prev_hash = 0;
+
 	for (size_t step = 0; step < step_count; step++)
 	{
 		std::vector<TaciState> next_states = state.GetNextStates();
-		state = next_states[rand() % next_states.size()];
+
+		TaciState next_state;
+		do { next_state = next_states[rand() % next_states.size()]; } while (next_state.GetHash() == prev_hash);
+
+		prev_hash = state.GetHash();
+		state = next_state;
 	}
 
 	return state;
@@ -69,6 +77,8 @@ int main()
 	std::cout << "================================================================" << std::endl;
 	std::cout << std::endl;
 
+	// 1 2 3 4 5 6 7 8 0 4 1 3 0 2 5 7 8 6
+
 	// 1 2 3 4 5 6 7 8 0
 	std::cout << "Destination " << WIDTH << "x" << WIDTH << std::endl;
 	TaciState dst_state = RequestUserState(WIDTH);
@@ -83,7 +93,8 @@ int main()
 	}
 	else
 	{
-		src_state = GenerateState(dst_state, 30);
+		const int STEP_COUNT = 10;
+		src_state = GenerateState(dst_state, STEP_COUNT);
 		std::cout << "Source " << WIDTH << "x" << WIDTH << std::endl;
 		src_state.Print();
 	}

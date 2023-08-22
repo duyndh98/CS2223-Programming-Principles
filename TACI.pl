@@ -1,21 +1,26 @@
 dfs(Dst, Dst, _, [Dst]) :-
   print(found),nl,
+  print(Dst),nl,
   !.
 dfs(Cur, Dst, Visited, [Cur|Path]) :-
   find_pos_2d(Cur, 0, ZeroRowId, ZeroColId),
   transit(Cur, ZeroRowId, ZeroColId, Next),
   Cur \= Next,
   \+member(Next, Visited),
-  print(Cur), nl,
-  dfs(Next, Dst, [Cur|Visited], Path).
+  nl, print(Cur), nl,
+  dfs(Next, Dst, [Cur|Visited], Path),
+  length(Path, Len0),
+  length(Visited, Len),
+  write('Step '), print(Len), write(' '), print(Cur), write(' '),
+  write('Len '), print(Len0), write(' '), nl.
 
-transit(Cur, RowId, ColId, Next) :- pull_left(Cur, RowId, ColId, Next).
-transit(Cur, RowId, ColId, Next) :- pull_right(Cur, RowId, ColId, Next).
-transit(Cur, RowId, ColId, Next) :- pull_up(Cur, RowId, ColId, Next).
 transit(Cur, RowId, ColId, Next) :- pull_down(Cur, RowId, ColId, Next).
+transit(Cur, RowId, ColId, Next) :- pull_up(Cur, RowId, ColId, Next).
+transit(Cur, RowId, ColId, Next) :- pull_right(Cur, RowId, ColId, Next).
+transit(Cur, RowId, ColId, Next) :- pull_left(Cur, RowId, ColId, Next).
 
 pull_up(Src, RowId, ColId, Dst) :- RowId > 0,
-  print(up),nl,
+  write('up '),
   PullRowId is RowId - 1,
   get_val_2d(Src, PullRowId, ColId, Val),
   set_val_2d(Src, PullRowId, ColId, 0, Tmp),
@@ -23,7 +28,7 @@ pull_up(Src, RowId, ColId, Dst) :- RowId > 0,
   !.
 
 pull_down(Src, RowId, ColId, Dst) :- length(Src, RowCount), RowId < RowCount - 1,
-  print(down),nl,
+  write('down '),
   PullRowId is RowId + 1,
   get_val_2d(Src, PullRowId, ColId, Val),
   set_val_2d(Src, PullRowId, ColId, 0, Tmp),
@@ -31,7 +36,7 @@ pull_down(Src, RowId, ColId, Dst) :- length(Src, RowCount), RowId < RowCount - 1
   !.
 
 pull_left(Src, RowId, ColId, Dst) :- ColId > 0,
-  print(left),nl,
+  write('left '),
   PullColId is ColId - 1,
   get_val_2d(Src, RowId, PullColId, Val),
   set_val_2d(Src, RowId, PullColId, 0, Tmp),
@@ -39,7 +44,7 @@ pull_left(Src, RowId, ColId, Dst) :- ColId > 0,
   !.
 
 pull_right(Src, RowId, ColId, Dst) :- get_val(Src, 0, FirstRow), length(FirstRow, ColCount), ColId < ColCount - 1,
-  print(right),nl,
+  write('right '),
   PullColId is ColId + 1,
   get_val_2d(Src, RowId, PullColId, Val),
   set_val_2d(Src, RowId, PullColId, 0, Tmp),
@@ -84,5 +89,3 @@ set_val_2d([SrcRow|NextRows], 0, ColId, Val, [DstRow|NextRows]) :-
 set_val_2d([PrevRows|SrcNextRows], RowId, ColId, Val, [PrevRows|DstNextRows]) :- RowId > 0,
   FindRowId is RowId - 1,
   set_val_2d(SrcNextRows, FindRowId, ColId, Val, DstNextRows).
-
-

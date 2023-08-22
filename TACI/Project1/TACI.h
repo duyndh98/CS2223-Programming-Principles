@@ -63,7 +63,7 @@ inline void TaciState::Print()
 	size_t width = std::sqrt(_items.size());
 
 	std::cout << std::endl;
-
+	
 	size_t item_id = 0;
 	for (size_t row = 0; row < width; row++)
 	{
